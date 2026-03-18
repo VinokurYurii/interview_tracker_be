@@ -34,3 +34,7 @@
 # IDE
 .idea
 .vscode
+
+# AI
+*.md
+!README.md
