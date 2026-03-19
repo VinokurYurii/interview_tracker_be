@@ -1,0 +1,103 @@
+---
+openapi: 3.0.1
+info:
+  title: Interview Tracker API
+  version: v1
+paths:
+  "/api/user":
+    get:
+      summary: Returns the current user
+      tags:
+      - User
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: user returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - id
+                    - first_name
+                    - last_name
+                    - email
+                    properties:
+                      id:
+                        type: integer
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      email:
+                        type: string
+        '401':
+          description: unauthorized
+    patch:
+      summary: Updates the current user
+      tags:
+      - User
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: user updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required:
+                    - id
+                    - first_name
+                    - last_name
+                    - email
+                    properties:
+                      id:
+                        type: integer
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      email:
+                        type: string
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+security:
+- bearer_auth: []

@@ -33,6 +33,7 @@ gem 'thruster', require: false
 gem 'image_processing', '~> 1.2'
 gem 'devise'
 gem 'pundit'
+gem 'rswag-api'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem 'rack-cors'
@@ -40,6 +41,8 @@ gem 'pundit'
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[ mri windows ], require: 'debug/prelude'
+  gem 'factory_bot_rails'
+  gem 'rswag-specs'
 
   # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
   gem 'bundler-audit', require: false
@@ -53,4 +56,5 @@ end
 
 group :test do
   gem 'rspec-rails', '~> 8.0', '>= 8.0.1'
+  gem 'simplecov', require: false
 end
