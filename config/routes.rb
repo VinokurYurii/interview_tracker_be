@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   namespace :api do
     scope module: :v1 do
       resource :user, only: %i[show update]
+      resources :companies, only: %i[index create]
+      resources :positions, only: %i[index show create update destroy]
     end
   end
 
