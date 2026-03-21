@@ -3,6 +3,7 @@ class Position < ApplicationRecord
 
   belongs_to :user
   belongs_to :company
+  has_many :interview_stages, dependent: :destroy
 
   validates :title, presence: true
   validates :description, presence: true
