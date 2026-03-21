@@ -33,6 +33,7 @@ gem 'thruster', require: false
 gem 'image_processing', '~> 1.2'
 gem 'devise'
 gem 'pundit'
+gem 'active_model_serializers'
 gem 'rswag-api'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible

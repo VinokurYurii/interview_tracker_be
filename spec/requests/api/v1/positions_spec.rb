@@ -1,0 +1,274 @@
+require 'swagger_helper'
+
+RSpec.describe 'Api::V1::Positions', type: :request do
+  path '/api/positions' do
+    let(:Authorization) { '' }
+
+    get 'Returns positions for current user' do
+      tags 'Positions'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      response '200', 'positions returned' do
+        schema type: :array,
+               items: {
+                 type: :object,
+                 required: %w[id title status company_id user_id],
+                 properties: {
+                   id: { type: :integer },
+                   title: { type: :string },
+                   description: { type: :string },
+                   vacancy_url: { type: :string },
+                   status: { type: :string },
+                   company_id: { type: :integer },
+                   user_id: { type: :integer }
+                 }
+               }
+
+        let(:signed_in_user) { create(:user) }
+        let(:other_user) { create(:user) }
+        before do
+          create_list(:position, 2, user: signed_in_user)
+          create(:position, user: other_user)
+          sign_in signed_in_user
+        end
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data.length).to eq(2)
+          expect(data.map { |p| p['user_id'] }.uniq).to eq([signed_in_user.id])
+        end
+      end
+
+      response '401', 'unauthorized' do
+        run_test!
+      end
+    end
+
+    post 'Creates a position' do
+      tags 'Positions'
+      consumes 'application/json'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      parameter name: :position, in: :body, schema: {
+        type: :object,
+        required: %w[position],
+        properties: {
+          position: {
+            type: :object,
+            required: %w[title description vacancy_url company_id],
+            properties: {
+              title: { type: :string },
+              description: { type: :string },
+              vacancy_url: { type: :string },
+              status: { type: :string },
+              company_id: { type: :integer }
+            }
+          }
+        }
+      }
+
+      response '201', 'position created' do
+        schema type: :object,
+               required: %w[id title status],
+               properties: {
+                 id: { type: :integer },
+                 title: { type: :string },
+                 status: { type: :string },
+                 company_id: { type: :integer },
+                 user_id: { type: :integer }
+               }
+
+        let(:signed_in_user) { create(:user) }
+        let(:company) { create(:company) }
+        let(:position) do
+          { position: { title: 'Backend Engineer', description: 'desc', vacancy_url: 'https://example.com', company_id: company.id } }
+        end
+        before { sign_in signed_in_user }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['user_id']).to eq(signed_in_user.id)
+          expect(data['title']).to eq('Backend Engineer')
+        end
+      end
+
+      response '422', 'invalid params' do
+        schema type: :object,
+               properties: {
+                 errors: { type: :array, items: { type: :string } }
+               }
+
+        let(:signed_in_user) { create(:user) }
+        let(:company) { create(:company) }
+        let(:position) { { position: { title: '', description: 'desc', vacancy_url: 'https://example.com', company_id: company.id } } }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:position) { { position: { title: 'Backend Engineer' } } }
+
+        run_test!
+      end
+    end
+  end
+
+  path '/api/positions/{id}' do
+    let(:Authorization) { '' }
+
+    parameter name: :id, in: :path, type: :integer
+
+    get 'Returns a position' do
+      tags 'Positions'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      response '200', 'position returned with company' do
+        schema type: :object,
+               required: %w[id title status company],
+               properties: {
+                 id: { type: :integer },
+                 title: { type: :string },
+                 status: { type: :string },
+                 company_id: { type: :integer },
+                 company: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     name: { type: :string }
+                   }
+                 }
+               }
+
+        let(:signed_in_user) { create(:user) }
+        let(:record) { create(:position, user: signed_in_user) }
+        let(:id) { record.id }
+        before { sign_in signed_in_user }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['company']).to be_present
+          expect(data['company']['id']).to eq(record.company_id)
+        end
+      end
+
+      response '403', 'forbidden — not owner' do
+        let(:signed_in_user) { create(:user) }
+        let(:other_position) { create(:position) }
+        let(:id) { other_position.id }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '404', 'not found' do
+        let(:signed_in_user) { create(:user) }
+        let(:id) { 0 }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:id) { 1 }
+
+        run_test!
+      end
+    end
+
+    patch 'Updates a position' do
+      tags 'Positions'
+      consumes 'application/json'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      parameter name: :position, in: :body, schema: {
+        type: :object,
+        properties: {
+          position: {
+            type: :object,
+            properties: {
+              title: { type: :string },
+              description: { type: :string },
+              vacancy_url: { type: :string },
+              status: { type: :string }
+            }
+          }
+        }
+      }
+
+      response '200', 'position updated' do
+        let(:signed_in_user) { create(:user) }
+        let(:record) { create(:position, user: signed_in_user) }
+        let(:id) { record.id }
+        let(:position) { { position: { title: 'Updated Title' } } }
+        before { sign_in signed_in_user }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data['title']).to eq('Updated Title')
+        end
+      end
+
+      response '403', 'forbidden — not owner' do
+        let(:signed_in_user) { create(:user) }
+        let(:other_position) { create(:position) }
+        let(:id) { other_position.id }
+        let(:position) { { position: { title: 'Hack' } } }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '422', 'invalid params' do
+        let(:signed_in_user) { create(:user) }
+        let(:record) { create(:position, user: signed_in_user) }
+        let(:id) { record.id }
+        let(:position) { { position: { title: '' } } }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:id) { 1 }
+        let(:position) { { position: { title: 'x' } } }
+
+        run_test!
+      end
+    end
+
+    delete 'Deletes a position' do
+      tags 'Positions'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      response '204', 'position deleted' do
+        let(:signed_in_user) { create(:user) }
+        let(:record) { create(:position, user: signed_in_user) }
+        let(:id) { record.id }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '403', 'forbidden — not owner' do
+        let(:signed_in_user) { create(:user) }
+        let(:other_position) { create(:position) }
+        let(:id) { other_position.id }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:id) { 1 }
+
+        run_test!
+      end
+    end
+  end
+end

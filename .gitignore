@@ -39,3 +39,4 @@
 *.md
 !README.md
 /coverage/
+/.claude
