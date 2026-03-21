@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_21_192730) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_21_215045) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,7 +19,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_192730) do
     t.string "name", null: false
     t.string "site_link"
     t.datetime "updated_at", null: false
-    t.index "lower((name)::text)", name: "index_companies_on_lower_name", unique: true
+  end
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.text "content", null: false
+    t.datetime "created_at", null: false
+    t.string "feedback_type", null: false
+    t.bigint "interview_stage_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["interview_stage_id", "feedback_type"], name: "index_feedbacks_on_interview_stage_id_and_feedback_type", unique: true
+    t.index ["interview_stage_id"], name: "index_feedbacks_on_interview_stage_id"
+  end
+
+  create_table "interview_stages", force: :cascade do |t|
+    t.string "calendar_link"
+    t.datetime "created_at", null: false
+    t.text "notes"
+    t.bigint "position_id", null: false
+    t.datetime "scheduled_at"
+    t.string "stage_type", null: false
+    t.string "status", default: "planned", null: false
+    t.datetime "updated_at", null: false
+    t.index ["position_id", "stage_type"], name: "index_interview_stages_on_position_id_and_stage_type"
+    t.index ["position_id"], name: "index_interview_stages_on_position_id"
   end
 
   create_table "positions", force: :cascade do |t|
@@ -53,6 +75,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_21_192730) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "feedbacks", "interview_stages"
+  add_foreign_key "interview_stages", "positions"
   add_foreign_key "positions", "companies"
   add_foreign_key "positions", "users"
 end
