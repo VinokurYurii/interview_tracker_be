@@ -5,7 +5,7 @@ class Feedback < ApplicationRecord
 
   belongs_to :interview_stage
 
-  enum :feedback_type, FEEDBACK_TYPES.index_by(&:itself), prefix: false
+  enum :feedback_type, FEEDBACK_TYPES.index_by(&:itself)
 
   validates :feedback_type, presence: true
   validates :content, presence: true

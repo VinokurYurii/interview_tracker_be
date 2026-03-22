@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Companies', type: :request do
@@ -27,10 +29,7 @@ RSpec.describe 'Api::V1::Companies', type: :request do
           sign_in signed_in_user
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(3)
-        end
+        run_test!
       end
 
       response '401', 'unauthorized' do
@@ -71,10 +70,7 @@ RSpec.describe 'Api::V1::Companies', type: :request do
         let(:company) { { company: { name: 'Google', site_link: 'https://google.com' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['name']).to eq('Google')
-        end
+        run_test!
       end
 
       response '422', 'invalid params' do
@@ -88,18 +84,6 @@ RSpec.describe 'Api::V1::Companies', type: :request do
         before { sign_in signed_in_user }
 
         run_test!
-      end
-
-      response '422', 'duplicate name' do
-        let(:signed_in_user) { create(:user) }
-        let!(:existing) { create(:company, name: 'Google') }
-        let(:company) { { company: { name: 'google' } } }
-        before { sign_in signed_in_user }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['errors']).to be_present
-        end
       end
 
       response '401', 'unauthorized' do

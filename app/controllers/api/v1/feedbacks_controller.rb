@@ -18,7 +18,7 @@ module Api
         if feedback.save
           render json: feedback, status: :created
         else
-          render json: { errors: feedback.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: feedback.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -26,7 +26,7 @@ module Api
         if @feedback.update(feedback_params)
           render json: @feedback
         else
-          render json: { errors: @feedback.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @feedback.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -38,7 +38,9 @@ module Api
       private
 
       def set_stage
-        @stage = InterviewStage.joins(:position).where(positions: { user: current_user }).find(params[:interview_stage_id])
+        @stage = InterviewStage.joins(:position)
+                               .where(positions: { user: current_user, id: params[:position_id] })
+                               .find(params[:interview_stage_id])
       end
 
       def set_feedback

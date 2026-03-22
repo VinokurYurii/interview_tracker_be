@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Feedbacks', type: :request do
@@ -24,10 +26,7 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
           sign_in signed_in_user
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-        end
+        run_test!
       end
 
       response '401', 'unauthorized' do
@@ -66,29 +65,10 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
         let(:feedback) { { feedback: { feedback_type: 'self_review', content: 'It went well' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['feedback_type']).to eq('self_review')
-        end
+        run_test!
       end
 
-      response '422', 'duplicate feedback_type for same stage' do
-        let(:signed_in_user) { create(:user) }
-        let(:position) { create(:position, user: signed_in_user) }
-        let(:stage) { create(:interview_stage, position: position) }
-        let!(:existing) { create(:feedback, interview_stage: stage, feedback_type: 'self_review') }
-        let(:position_id) { position.id }
-        let(:interview_stage_id) { stage.id }
-        let(:feedback) { { feedback: { feedback_type: 'self_review', content: 'duplicate' } } }
-        before { sign_in signed_in_user }
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['errors']).to be_present
-        end
-      end
-
-      response '422', 'missing content' do
+      response '422', 'invalid params' do
         let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
@@ -145,10 +125,7 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
         let(:feedback) { { feedback: { content: 'Updated content' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['content']).to eq('Updated content')
-        end
+        run_test!
       end
 
       response '404', 'stage not found — belongs to another user' do

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Users', type: :request do
   path '/api/user' do
-    # Placeholder — replaced by JWT token once auth is implemented
     let(:Authorization) { '' }
 
     get 'Returns the current user' do
@@ -12,17 +13,12 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
       response '200', 'user returned' do
         schema type: :object,
+               required: %w[id first_name last_name email],
                properties: {
-                 data: {
-                   type: :object,
-                   required: %w[id first_name last_name email],
-                   properties: {
-                     id: { type: :integer },
-                     first_name: { type: :string },
-                     last_name: { type: :string },
-                     email: { type: :string }
-                   }
-                 }
+                 id: { type: :integer },
+                 first_name: { type: :string },
+                 last_name: { type: :string },
+                 email: { type: :string }
                }
 
         let(:signed_in_user) { create(:user) }
@@ -57,17 +53,12 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
       response '200', 'user updated' do
         schema type: :object,
+               required: %w[id first_name last_name email],
                properties: {
-                 data: {
-                   type: :object,
-                   required: %w[id first_name last_name email],
-                   properties: {
-                     id: { type: :integer },
-                     first_name: { type: :string },
-                     last_name: { type: :string },
-                     email: { type: :string }
-                   }
-                 }
+                 id: { type: :integer },
+                 first_name: { type: :string },
+                 last_name: { type: :string },
+                 email: { type: :string }
                }
 
         let(:signed_in_user) { create(:user) }

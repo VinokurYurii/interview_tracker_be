@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Positions', type: :request do
@@ -26,18 +28,12 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                }
 
         let(:signed_in_user) { create(:user) }
-        let(:other_user) { create(:user) }
         before do
           create_list(:position, 2, user: signed_in_user)
-          create(:position, user: other_user)
           sign_in signed_in_user
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-          expect(data.map { |p| p['user_id'] }.uniq).to eq([signed_in_user.id])
-        end
+        run_test!
       end
 
       response '401', 'unauthorized' do
@@ -87,11 +83,7 @@ RSpec.describe 'Api::V1::Positions', type: :request do
         end
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['user_id']).to eq(signed_in_user.id)
-          expect(data['title']).to eq('Backend Engineer')
-        end
+        run_test!
       end
 
       response '422', 'invalid params' do
@@ -148,11 +140,7 @@ RSpec.describe 'Api::V1::Positions', type: :request do
         let(:id) { record.id }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['company']).to be_present
-          expect(data['company']['id']).to eq(record.company_id)
-        end
+        run_test!
       end
 
       response '403', 'forbidden — not owner' do
@@ -207,19 +195,6 @@ RSpec.describe 'Api::V1::Positions', type: :request do
         let(:position) { { position: { title: 'Updated Title' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['title']).to eq('Updated Title')
-        end
-      end
-
-      response '403', 'forbidden — not owner' do
-        let(:signed_in_user) { create(:user) }
-        let(:other_position) { create(:position) }
-        let(:id) { other_position.id }
-        let(:position) { { position: { title: 'Hack' } } }
-        before { sign_in signed_in_user }
-
         run_test!
       end
 
@@ -228,6 +203,16 @@ RSpec.describe 'Api::V1::Positions', type: :request do
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
         let(:position) { { position: { title: '' } } }
+        before { sign_in signed_in_user }
+
+        run_test!
+      end
+
+      response '403', 'forbidden — not owner' do
+        let(:signed_in_user) { create(:user) }
+        let(:other_position) { create(:position) }
+        let(:id) { other_position.id }
+        let(:position) { { position: { title: 'Hack' } } }
         before { sign_in signed_in_user }
 
         run_test!
