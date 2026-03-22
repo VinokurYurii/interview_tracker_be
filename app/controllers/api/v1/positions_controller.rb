@@ -6,7 +6,7 @@ module Api
       before_action :set_position, only: %i[show update destroy]
 
       def index
-        positions = policy_scope(Position)
+        positions = policy_scope(Position).includes(:company, interview_stages: :feedbacks)
         render json: positions
       end
 
@@ -21,7 +21,7 @@ module Api
         if position.save
           render json: position, status: :created
         else
-          render json: { errors: position.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: position.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -29,7 +29,7 @@ module Api
         if @position.update(update_params)
           render json: @position
         else
-          render json: { errors: @position.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @position.errors.full_messages }, status: :unprocessable_content
         end
       end
 

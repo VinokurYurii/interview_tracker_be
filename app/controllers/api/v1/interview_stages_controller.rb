@@ -7,7 +7,7 @@ module Api
       before_action :set_stage, only: %i[show update destroy]
 
       def index
-        stages = policy_scope(InterviewStage).where(position: @position)
+        stages = policy_scope(InterviewStage).where(position: @position).includes(:feedbacks)
         render json: stages
       end
 
@@ -16,21 +16,21 @@ module Api
       end
 
       def create
-        stage = @position.interview_stages.new(stage_params)
+        stage = @position.interview_stages.new(upsert_params)
         authorize stage
 
         if stage.save
           render json: stage, status: :created
         else
-          render json: { errors: stage.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: stage.errors.full_messages }, status: :unprocessable_content
         end
       end
 
       def update
-        if @stage.update(update_params)
+        if @stage.update(upsert_params)
           render json: @stage
         else
-          render json: { errors: @stage.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @stage.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -42,7 +42,7 @@ module Api
       private
 
       def set_position
-        @position = Position.find(params[:position_id])
+        @position = current_user.positions.find(params[:position_id])
       end
 
       def set_stage
@@ -50,11 +50,7 @@ module Api
         authorize @stage
       end
 
-      def stage_params
-        params.expect(interview_stage: %i[stage_type status scheduled_at calendar_link notes])
-      end
-
-      def update_params
+      def upsert_params
         params.expect(interview_stage: %i[stage_type status scheduled_at calendar_link notes])
       end
     end

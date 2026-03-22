@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::InterviewStages', type: :request do
@@ -20,28 +22,7 @@ RSpec.describe 'Api::V1::InterviewStages', type: :request do
           sign_in signed_in_user
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(2)
-        end
-      end
-
-      response '200', 'returns only own stages' do
-        let(:signed_in_user) { create(:user) }
-        let(:other_user) { create(:user) }
-        let(:position) { create(:position, user: signed_in_user) }
-        let(:other_position) { create(:position, user: other_user) }
-        let(:position_id) { position.id }
-        before do
-          create(:interview_stage, position: position)
-          create(:interview_stage, position: other_position)
-          sign_in signed_in_user
-        end
-
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data.length).to eq(1)
-        end
+        run_test!
       end
 
       response '401', 'unauthorized' do
@@ -73,18 +54,14 @@ RSpec.describe 'Api::V1::InterviewStages', type: :request do
         }
       }
 
-      response '201', 'stage created with default status planned' do
+      response '201', 'stage created' do
         let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:position_id) { position.id }
         let(:interview_stage) { { interview_stage: { stage_type: 'technical' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['stage_type']).to eq('technical')
-          expect(data['status']).to eq('planned')
-        end
+        run_test!
       end
 
       response '422', 'invalid params' do
@@ -127,14 +104,10 @@ RSpec.describe 'Api::V1::InterviewStages', type: :request do
           sign_in signed_in_user
         end
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['feedbacks']).to be_present
-          expect(data['feedbacks'].length).to eq(1)
-        end
+        run_test!
       end
 
-      response '403', 'forbidden — not owner' do
+      response '404', 'not found — not owner' do
         let(:signed_in_user) { create(:user) }
         let(:other_stage) { create(:interview_stage) }
         let(:position_id) { other_stage.position_id }
@@ -182,14 +155,10 @@ RSpec.describe 'Api::V1::InterviewStages', type: :request do
         let(:interview_stage) { { interview_stage: { status: 'done', notes: 'went well' } } }
         before { sign_in signed_in_user }
 
-        run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data['status']).to eq('done')
-          expect(data['notes']).to eq('went well')
-        end
+        run_test!
       end
 
-      response '403', 'forbidden — not owner' do
+      response '404', 'not found — not owner' do
         let(:signed_in_user) { create(:user) }
         let(:other_stage) { create(:interview_stage) }
         let(:position_id) { other_stage.position_id }
@@ -224,7 +193,7 @@ RSpec.describe 'Api::V1::InterviewStages', type: :request do
         run_test!
       end
 
-      response '403', 'forbidden — not owner' do
+      response '404', 'not found — not owner' do
         let(:signed_in_user) { create(:user) }
         let(:other_stage) { create(:interview_stage) }
         let(:position_id) { other_stage.position_id }

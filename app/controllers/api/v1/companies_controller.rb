@@ -15,7 +15,7 @@ module Api
         if company.save
           render json: company, status: :created
         else
-          render json: { errors: company.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: company.errors.full_messages }, status: :unprocessable_content
         end
       end
 

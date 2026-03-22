@@ -7,8 +7,8 @@ class InterviewStage < ApplicationRecord
   belongs_to :position
   has_many :feedbacks, dependent: :destroy
 
-  enum :stage_type, STAGE_TYPES.index_by(&:itself), prefix: false
-  enum :status, STATUSES.index_by(&:itself), prefix: false
+  enum :stage_type, STAGE_TYPES.index_by(&:itself)
+  enum :status, STATUSES.index_by(&:itself)
 
   validates :stage_type, presence: true
   validates :status, presence: true

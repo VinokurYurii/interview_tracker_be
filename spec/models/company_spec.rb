@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Company, type: :model do
@@ -20,11 +22,12 @@ RSpec.describe Company, type: :model do
       expect(company.users).to contain_exactly(user1, user2)
     end
 
-    it 'destroys positions when destroyed' do
+    it 'prevents destruction when positions exist' do
       company = create(:company)
       create(:position, company: company)
 
-      expect { company.destroy }.to change(Position, :count).by(-1)
+      expect(company.destroy).to be_falsey
+      expect(company.errors[:base]).to be_present
     end
   end
 

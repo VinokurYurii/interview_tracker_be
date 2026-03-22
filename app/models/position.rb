@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Position < ApplicationRecord
   STATUSES = %w[active rejected offer accepted].freeze
 
@@ -8,5 +10,5 @@ class Position < ApplicationRecord
   validates :title, presence: true
   validates :description, presence: true
   validates :vacancy_url, presence: true
-  enum :status, STATUSES.index_by(&:itself), prefix: false
+  enum :status, STATUSES.index_by(&:itself)
 end
