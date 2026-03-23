@@ -4,7 +4,8 @@ require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Users', type: :request do
   path '/api/user' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     get 'Returns the current user' do
       tags 'User'
@@ -21,13 +22,12 @@ RSpec.describe 'Api::V1::Users', type: :request do
                  email: { type: :string }
                }
 
-        let(:signed_in_user) { create(:user) }
-        before { sign_in signed_in_user }
-
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
+
         run_test!
       end
     end
@@ -61,9 +61,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
                  email: { type: :string }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:user) { { user: { first_name: 'Jane' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
@@ -74,14 +72,13 @@ RSpec.describe 'Api::V1::Users', type: :request do
                  errors: { type: :array, items: { type: :string } }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:user) { { user: { first_name: '' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:user) { { user: { first_name: 'Jane' } } }
 
         run_test!

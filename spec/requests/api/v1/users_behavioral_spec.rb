@@ -4,13 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Api::V1::Users', type: :request do
   let(:user) { create(:user, first_name: 'John', last_name: 'Doe') }
+  let(:headers) { auth_headers_for(user) }
 
   describe 'GET /api/user' do
     context 'when authenticated' do
-      before { sign_in user }
-
       it 'returns current user data' do
-        get '/api/user'
+        get '/api/user', headers: headers
 
         expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body)
@@ -24,10 +23,8 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
   describe 'PATCH /api/user' do
     context 'when authenticated' do
-      before { sign_in user }
-
       it 'updates user attributes and returns updated data' do
-        patch '/api/user', params: { user: { first_name: 'Jane', last_name: 'Smith' } }, as: :json
+        patch '/api/user', params: { user: { first_name: 'Jane', last_name: 'Smith' } }, headers: headers, as: :json
 
         expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body)
@@ -37,7 +34,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
       end
 
       it 'returns errors for invalid params' do
-        patch '/api/user', params: { user: { first_name: '' } }, as: :json
+        patch '/api/user', params: { user: { first_name: '' } }, headers: headers, as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         data = JSON.parse(response.body)

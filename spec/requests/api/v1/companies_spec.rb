@@ -4,7 +4,8 @@ require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Companies', type: :request do
   path '/api/companies' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     get 'Returns list of all companies' do
       tags 'Companies'
@@ -23,16 +24,14 @@ RSpec.describe 'Api::V1::Companies', type: :request do
                  }
                }
 
-        let(:signed_in_user) { create(:user) }
-        before do
-          create_list(:company, 3)
-          sign_in signed_in_user
-        end
+        before { create_list(:company, 3) }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
+
         run_test!
       end
     end
@@ -66,9 +65,7 @@ RSpec.describe 'Api::V1::Companies', type: :request do
                  site_link: { type: :string, nullable: true }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:company) { { company: { name: 'Google', site_link: 'https://google.com' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
@@ -79,14 +76,13 @@ RSpec.describe 'Api::V1::Companies', type: :request do
                  errors: { type: :array, items: { type: :string } }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:company) { { company: { name: '' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:company) { { company: { name: 'Google' } } }
 
         run_test!

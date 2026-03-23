@@ -6,15 +6,14 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
   let(:user) { create(:user) }
   let(:position) { create(:position, user: user) }
   let(:stage) { create(:interview_stage, position: position) }
-
-  before { sign_in user }
+  let(:headers) { auth_headers_for(user) }
 
   describe 'GET /api/positions/:position_id/interview_stages/:interview_stage_id/feedbacks' do
     it 'returns feedbacks for the stage' do
       create(:feedback, interview_stage: stage, feedback_type: 'self_review')
       create(:feedback, interview_stage: stage, feedback_type: 'company')
 
-      get "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks"
+      get "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks", headers: headers
 
       expect(response).to have_http_status(:ok)
       data = JSON.parse(response.body)
@@ -24,7 +23,7 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
     it 'returns 404 for another user\'s stage' do
       other_stage = create(:interview_stage)
 
-      get "/api/positions/#{other_stage.position_id}/interview_stages/#{other_stage.id}/feedbacks"
+      get "/api/positions/#{other_stage.position_id}/interview_stages/#{other_stage.id}/feedbacks", headers: headers
 
       expect(response).to have_http_status(:not_found)
     end
@@ -34,7 +33,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
     it 'creates a feedback' do
       expect {
         post "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks",
-             params: { feedback: { feedback_type: 'self_review', content: 'It went well' } }, as: :json
+             params: { feedback: { feedback_type: 'self_review', content: 'It went well' } },
+             headers: headers, as: :json
       }.to change(Feedback, :count).by(1)
 
       expect(response).to have_http_status(:created)
@@ -47,7 +47,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       create(:feedback, interview_stage: stage, feedback_type: 'self_review')
 
       post "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks",
-           params: { feedback: { feedback_type: 'self_review', content: 'duplicate' } }, as: :json
+           params: { feedback: { feedback_type: 'self_review', content: 'duplicate' } },
+           headers: headers, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
       data = JSON.parse(response.body)
@@ -56,7 +57,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
 
     it 'rejects blank content' do
       post "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks",
-           params: { feedback: { feedback_type: 'company', content: '' } }, as: :json
+           params: { feedback: { feedback_type: 'company', content: '' } },
+           headers: headers, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
     end
@@ -65,7 +67,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       other_stage = create(:interview_stage)
 
       post "/api/positions/#{other_stage.position_id}/interview_stages/#{other_stage.id}/feedbacks",
-           params: { feedback: { feedback_type: 'self_review', content: 'hack' } }, as: :json
+           params: { feedback: { feedback_type: 'self_review', content: 'hack' } },
+           headers: headers, as: :json
 
       expect(response).to have_http_status(:not_found)
     end
@@ -76,7 +79,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       feedback = create(:feedback, interview_stage: stage, feedback_type: 'self_review')
 
       patch "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks/#{feedback.id}",
-            params: { feedback: { content: 'Updated content' } }, as: :json
+            params: { feedback: { content: 'Updated content' } },
+            headers: headers, as: :json
 
       expect(response).to have_http_status(:ok)
       data = JSON.parse(response.body)
@@ -88,7 +92,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       other_feedback = create(:feedback)
 
       patch "/api/positions/#{other_feedback.interview_stage.position_id}/interview_stages/#{other_feedback.interview_stage_id}/feedbacks/#{other_feedback.id}",
-            params: { feedback: { content: 'hack' } }, as: :json
+            params: { feedback: { content: 'hack' } },
+            headers: headers, as: :json
 
       expect(response).to have_http_status(:not_found)
     end
@@ -99,7 +104,7 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       feedback = create(:feedback, interview_stage: stage, feedback_type: 'self_review')
 
       expect {
-        delete "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks/#{feedback.id}"
+        delete "/api/positions/#{position.id}/interview_stages/#{stage.id}/feedbacks/#{feedback.id}", headers: headers
       }.to change(Feedback, :count).by(-1)
 
       expect(response).to have_http_status(:no_content)
@@ -108,7 +113,8 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
     it 'returns 404 for another user\'s feedback' do
       other_feedback = create(:feedback)
 
-      delete "/api/positions/#{other_feedback.interview_stage.position_id}/interview_stages/#{other_feedback.interview_stage_id}/feedbacks/#{other_feedback.id}"
+      delete "/api/positions/#{other_feedback.interview_stage.position_id}/interview_stages/#{other_feedback.interview_stage_id}/feedbacks/#{other_feedback.id}",
+             headers: headers
 
       expect(response).to have_http_status(:not_found)
     end

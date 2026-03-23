@@ -1,11 +1,14 @@
 Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
 
-  devise_for :users, controllers: {
-    sessions: 'users/sessions',
-    passwords: 'users/passwords',
-    registrations: 'users/registrations'
-  }
+  devise_for :users,
+             path: 'api/auth',
+             path_names: { sign_in: 'sign_in', sign_out: 'sign_out', registration: 'sign_up' },
+             controllers: {
+               sessions: 'api/auth/sessions',
+               registrations: 'api/auth/registrations'
+             },
+             skip: [:passwords] # TODO: Add password reset routes when React frontend is ready
 
   namespace :api do
     scope module: :v1 do

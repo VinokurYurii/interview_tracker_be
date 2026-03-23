@@ -4,6 +4,651 @@ info:
   title: Interview Tracker API
   version: v1
 paths:
+  "/api/auth/sign_up":
+    post:
+      summary: Registers a new user
+      tags:
+      - Authentication
+      security: []
+      parameters: []
+      responses:
+        '201':
+          description: user registered — JWT token returned in Authorization header
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - first_name
+                - last_name
+                - email
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - user
+              properties:
+                user:
+                  type: object
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+                  - first_name
+                  - last_name
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+  "/api/auth/sign_in":
+    post:
+      summary: Signs in a user
+      tags:
+      - Authentication
+      security: []
+      parameters: []
+      responses:
+        '200':
+          description: signed in — JWT token returned in Authorization header
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - first_name
+                - last_name
+                - email
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
+        '401':
+          description: invalid credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - user
+              properties:
+                user:
+                  type: object
+                  required:
+                  - email
+                  - password
+                  properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+  "/api/auth/sign_out":
+    delete:
+      summary: Signs out a user
+      tags:
+      - Authentication
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: signed out — token revoked
+        '401':
+          description: unauthorized
+  "/api/companies":
+    get:
+      summary: Returns list of all companies
+      tags:
+      - Companies
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: companies returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - name
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    site_link:
+                      type: string
+                      nullable: true
+        '401':
+          description: unauthorized
+    post:
+      summary: Creates a company
+      tags:
+      - Companies
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: company created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - name
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  site_link:
+                    type: string
+                    nullable: true
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                company:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    site_link:
+                      type: string
+  "/api/positions/{position_id}/interview_stages/{interview_stage_id}/feedbacks":
+    parameters:
+    - name: position_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: interview_stage_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Returns feedbacks for an interview stage
+      tags:
+      - Feedbacks
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: feedbacks returned
+        '401':
+          description: unauthorized
+    post:
+      summary: Creates a feedback
+      tags:
+      - Feedbacks
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: feedback created
+        '422':
+          description: invalid params
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+                  required:
+                  - feedback_type
+                  - content
+                  properties:
+                    feedback_type:
+                      type: string
+                      enum:
+                      - self_review
+                      - company
+                    content:
+                      type: string
+  "/api/positions/{position_id}/interview_stages/{interview_stage_id}/feedbacks/{id}":
+    parameters:
+    - name: position_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: interview_stage_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Updates a feedback
+      tags:
+      - Feedbacks
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: feedback updated
+        '404':
+          description: stage not found — belongs to another user
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+    delete:
+      summary: Deletes a feedback
+      tags:
+      - Feedbacks
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: feedback deleted
+        '404':
+          description: stage not found — belongs to another user
+        '401':
+          description: unauthorized
+  "/api/positions/{position_id}/interview_stages":
+    parameters:
+    - name: position_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Returns interview stages for a position
+      tags:
+      - InterviewStages
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: stages returned
+        '401':
+          description: unauthorized
+    post:
+      summary: Creates an interview stage
+      tags:
+      - InterviewStages
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: stage created
+        '422':
+          description: invalid params
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                interview_stage:
+                  type: object
+                  required:
+                  - stage_type
+                  properties:
+                    stage_type:
+                      type: string
+                    status:
+                      type: string
+                    scheduled_at:
+                      type: string
+                      format: date-time
+                    calendar_link:
+                      type: string
+                    notes:
+                      type: string
+  "/api/positions/{position_id}/interview_stages/{id}":
+    parameters:
+    - name: position_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Returns an interview stage with feedbacks
+      tags:
+      - InterviewStages
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: stage returned with feedbacks
+        '404':
+          description: not found — not owner
+        '401':
+          description: unauthorized
+    patch:
+      summary: Updates an interview stage
+      tags:
+      - InterviewStages
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: stage updated
+        '404':
+          description: not found — not owner
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                interview_stage:
+                  type: object
+                  properties:
+                    stage_type:
+                      type: string
+                    status:
+                      type: string
+                    scheduled_at:
+                      type: string
+                      format: date-time
+                    calendar_link:
+                      type: string
+                    notes:
+                      type: string
+    delete:
+      summary: Deletes an interview stage
+      tags:
+      - InterviewStages
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: stage deleted
+        '404':
+          description: not found — not owner
+        '401':
+          description: unauthorized
+  "/api/positions":
+    get:
+      summary: Returns positions for current user
+      tags:
+      - Positions
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: positions returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - title
+                  - status
+                  - company_id
+                  - user_id
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    vacancy_url:
+                      type: string
+                    status:
+                      type: string
+                    company_id:
+                      type: integer
+                    user_id:
+                      type: integer
+        '401':
+          description: unauthorized
+    post:
+      summary: Creates a position
+      tags:
+      - Positions
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: position created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - title
+                - status
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  status:
+                    type: string
+                  company_id:
+                    type: integer
+                  user_id:
+                    type: integer
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - position
+              properties:
+                position:
+                  type: object
+                  required:
+                  - title
+                  - description
+                  - vacancy_url
+                  - company_id
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    vacancy_url:
+                      type: string
+                    status:
+                      type: string
+                    company_id:
+                      type: integer
+  "/api/positions/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Returns a position
+      tags:
+      - Positions
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: position returned with company
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - title
+                - status
+                - company
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  status:
+                    type: string
+                  company_id:
+                    type: integer
+                  company:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+        '403':
+          description: forbidden — not owner
+        '404':
+          description: not found
+        '401':
+          description: unauthorized
+    patch:
+      summary: Updates a position
+      tags:
+      - Positions
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: position updated
+        '422':
+          description: invalid params
+        '403':
+          description: forbidden — not owner
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                    description:
+                      type: string
+                    vacancy_url:
+                      type: string
+                    status:
+                      type: string
+    delete:
+      summary: Deletes a position
+      tags:
+      - Positions
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: position deleted
+        '403':
+          description: forbidden — not owner
+        '401':
+          description: unauthorized
   "/api/user":
     get:
       summary: Returns the current user
@@ -18,23 +663,20 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                - id
+                - first_name
+                - last_name
+                - email
                 properties:
-                  data:
-                    type: object
-                    required:
-                    - id
-                    - first_name
-                    - last_name
-                    - email
-                    properties:
-                      id:
-                        type: integer
-                      first_name:
-                        type: string
-                      last_name:
-                        type: string
-                      email:
-                        type: string
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
         '401':
           description: unauthorized
     patch:
@@ -51,23 +693,20 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                - id
+                - first_name
+                - last_name
+                - email
                 properties:
-                  data:
-                    type: object
-                    required:
-                    - id
-                    - first_name
-                    - last_name
-                    - email
-                    properties:
-                      id:
-                        type: integer
-                      first_name:
-                        type: string
-                      last_name:
-                        type: string
-                      email:
-                        type: string
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  email:
+                    type: string
         '422':
           description: invalid params
           content:

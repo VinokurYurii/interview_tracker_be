@@ -4,7 +4,8 @@ require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Feedbacks', type: :request do
   path '/api/positions/{position_id}/interview_stages/{interview_stage_id}/feedbacks' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     parameter name: :position_id, in: :path, type: :integer
     parameter name: :interview_stage_id, in: :path, type: :integer
@@ -15,7 +16,6 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       security [{ bearer_auth: [] }]
 
       response '200', 'feedbacks returned' do
-        let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
         let(:position_id) { position.id }
@@ -23,15 +23,16 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
         before do
           create(:feedback, interview_stage: stage, feedback_type: 'self_review')
           create(:feedback, interview_stage: stage, feedback_type: 'company')
-          sign_in signed_in_user
         end
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:position_id) { 1 }
         let(:interview_stage_id) { 1 }
+
         run_test!
       end
     end
@@ -57,40 +58,39 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       }
 
       response '201', 'feedback created' do
-        let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
         let(:position_id) { position.id }
         let(:interview_stage_id) { stage.id }
         let(:feedback) { { feedback: { feedback_type: 'self_review', content: 'It went well' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '422', 'invalid params' do
-        let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
         let(:position_id) { position.id }
         let(:interview_stage_id) { stage.id }
         let(:feedback) { { feedback: { feedback_type: 'company', content: '' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:position_id) { 1 }
         let(:interview_stage_id) { 1 }
         let(:feedback) { { feedback: { feedback_type: 'self_review', content: 'x' } } }
+
         run_test!
       end
     end
   end
 
   path '/api/positions/{position_id}/interview_stages/{interview_stage_id}/feedbacks/{id}' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     parameter name: :position_id, in: :path, type: :integer
     parameter name: :interview_stage_id, in: :path, type: :integer
@@ -115,7 +115,6 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       }
 
       response '200', 'feedback updated' do
-        let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
         let(:record) { create(:feedback, interview_stage: stage, feedback_type: 'self_review') }
@@ -123,28 +122,27 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
         let(:interview_stage_id) { stage.id }
         let(:id) { record.id }
         let(:feedback) { { feedback: { content: 'Updated content' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '404', 'stage not found — belongs to another user' do
-        let(:signed_in_user) { create(:user) }
         let(:other_feedback) { create(:feedback) }
         let(:position_id) { other_feedback.interview_stage.position_id }
         let(:interview_stage_id) { other_feedback.interview_stage_id }
         let(:id) { other_feedback.id }
         let(:feedback) { { feedback: { content: 'hack' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:position_id) { 1 }
         let(:interview_stage_id) { 1 }
         let(:id) { 1 }
         let(:feedback) { { feedback: { content: 'x' } } }
+
         run_test!
       end
     end
@@ -155,33 +153,31 @@ RSpec.describe 'Api::V1::Feedbacks', type: :request do
       security [{ bearer_auth: [] }]
 
       response '204', 'feedback deleted' do
-        let(:signed_in_user) { create(:user) }
         let(:position) { create(:position, user: signed_in_user) }
         let(:stage) { create(:interview_stage, position: position) }
         let(:record) { create(:feedback, interview_stage: stage, feedback_type: 'self_review') }
         let(:position_id) { position.id }
         let(:interview_stage_id) { stage.id }
         let(:id) { record.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '404', 'stage not found — belongs to another user' do
-        let(:signed_in_user) { create(:user) }
         let(:other_feedback) { create(:feedback) }
         let(:position_id) { other_feedback.interview_stage.position_id }
         let(:interview_stage_id) { other_feedback.interview_stage_id }
         let(:id) { other_feedback.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:position_id) { 1 }
         let(:interview_stage_id) { 1 }
         let(:id) { 1 }
+
         run_test!
       end
     end
