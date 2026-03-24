@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+# In development, ensure gems are up to date (useful when code is volume-mounted)
+if [ "$RAILS_ENV" = "development" ]; then
+  bundle check || bundle install
+fi
+
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
