@@ -4,7 +4,8 @@ require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Positions', type: :request do
   path '/api/positions' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     get 'Returns positions for current user' do
       tags 'Positions'
@@ -27,16 +28,14 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                  }
                }
 
-        let(:signed_in_user) { create(:user) }
-        before do
-          create_list(:position, 2, user: signed_in_user)
-          sign_in signed_in_user
-        end
+        before { create_list(:position, 2, user: signed_in_user) }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
+
         run_test!
       end
     end
@@ -76,12 +75,10 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                  user_id: { type: :integer }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:company) { create(:company) }
         let(:position) do
           { position: { title: 'Backend Engineer', description: 'desc', vacancy_url: 'https://example.com', company_id: company.id } }
         end
-        before { sign_in signed_in_user }
 
         run_test!
       end
@@ -92,15 +89,14 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                  errors: { type: :array, items: { type: :string } }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:company) { create(:company) }
         let(:position) { { position: { title: '', description: 'desc', vacancy_url: 'https://example.com', company_id: company.id } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:position) { { position: { title: 'Backend Engineer' } } }
 
         run_test!
@@ -109,7 +105,8 @@ RSpec.describe 'Api::V1::Positions', type: :request do
   end
 
   path '/api/positions/{id}' do
-    let(:Authorization) { '' }
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
 
     parameter name: :id, in: :path, type: :integer
 
@@ -135,32 +132,27 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                  }
                }
 
-        let(:signed_in_user) { create(:user) }
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '403', 'forbidden — not owner' do
-        let(:signed_in_user) { create(:user) }
         let(:other_position) { create(:position) }
         let(:id) { other_position.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '404', 'not found' do
-        let(:signed_in_user) { create(:user) }
         let(:id) { 0 }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:id) { 1 }
 
         run_test!
@@ -189,36 +181,31 @@ RSpec.describe 'Api::V1::Positions', type: :request do
       }
 
       response '200', 'position updated' do
-        let(:signed_in_user) { create(:user) }
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
         let(:position) { { position: { title: 'Updated Title' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '422', 'invalid params' do
-        let(:signed_in_user) { create(:user) }
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
         let(:position) { { position: { title: '' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '403', 'forbidden — not owner' do
-        let(:signed_in_user) { create(:user) }
         let(:other_position) { create(:position) }
         let(:id) { other_position.id }
         let(:position) { { position: { title: 'Hack' } } }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:id) { 1 }
         let(:position) { { position: { title: 'x' } } }
 
@@ -232,24 +219,21 @@ RSpec.describe 'Api::V1::Positions', type: :request do
       security [{ bearer_auth: [] }]
 
       response '204', 'position deleted' do
-        let(:signed_in_user) { create(:user) }
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '403', 'forbidden — not owner' do
-        let(:signed_in_user) { create(:user) }
         let(:other_position) { create(:position) }
         let(:id) { other_position.id }
-        before { sign_in signed_in_user }
 
         run_test!
       end
 
       response '401', 'unauthorized' do
+        let(:Authorization) { '' }
         let(:id) { 1 }
 
         run_test!
