@@ -28,14 +28,6 @@ RSpec.describe Position, type: :model do
       expect(build(:position, title: nil)).to be_invalid
     end
 
-    it 'is invalid without a description' do
-      expect(build(:position, description: nil)).to be_invalid
-    end
-
-    it 'is invalid without a vacancy_url' do
-      expect(build(:position, vacancy_url: nil)).to be_invalid
-    end
-
     it 'raises on unknown status assignment' do
       position = build(:position)
       expect { position.status = 'unknown' }.to raise_error(ArgumentError)

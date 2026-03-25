@@ -44,10 +44,10 @@ RSpec.describe 'Api::V1::Companies', type: :request do
 
       parameter name: :company, in: :body, schema: {
         type: :object,
-        required: %w[name],
         properties: {
           company: {
             type: :object,
+            required: %w[name],
             properties: {
               name: { type: :string },
               site_link: { type: :string }

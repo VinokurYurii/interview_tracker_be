@@ -202,11 +202,11 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-              - name
               properties:
                 company:
                   type: object
+                  required:
+                  - name
                   properties:
                     name:
                       type: string
@@ -478,14 +478,23 @@ paths:
                       type: string
                     description:
                       type: string
+                      nullable: true
                     vacancy_url:
                       type: string
+                      nullable: true
                     status:
                       type: string
                     company_id:
                       type: integer
                     user_id:
                       type: integer
+                    company:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
         '401':
           description: unauthorized
     post:
@@ -506,17 +515,31 @@ paths:
                 - id
                 - title
                 - status
+                - company
                 properties:
                   id:
                     type: integer
                   title:
                     type: string
+                  description:
+                    type: string
+                    nullable: true
+                  vacancy_url:
+                    type: string
+                    nullable: true
                   status:
                     type: string
                   company_id:
                     type: integer
                   user_id:
                     type: integer
+                  company:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
         '422':
           description: invalid params
           content:
@@ -542,8 +565,6 @@ paths:
                   type: object
                   required:
                   - title
-                  - description
-                  - vacancy_url
                   - company_id
                   properties:
                     title:
@@ -613,6 +634,39 @@ paths:
       responses:
         '200':
           description: position updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - title
+                - status
+                - company
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  vacancy_url:
+                    type: string
+                    nullable: true
+                  status:
+                    type: string
+                  company_id:
+                    type: integer
+                  user_id:
+                    type: integer
+                  company:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
         '422':
           description: invalid params
         '403':
