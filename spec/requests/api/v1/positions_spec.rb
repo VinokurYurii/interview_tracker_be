@@ -73,13 +73,22 @@ RSpec.describe 'Api::V1::Positions', type: :request do
 
       response '201', 'position created' do
         schema type: :object,
-               required: %w[id title status],
+               required: %w[id title status company],
                properties: {
                  id: { type: :integer },
                  title: { type: :string },
+                 description: { type: :string, nullable: true },
+                 vacancy_url: { type: :string, nullable: true },
                  status: { type: :string },
                  company_id: { type: :integer },
-                 user_id: { type: :integer }
+                 user_id: { type: :integer },
+                 company: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     name: { type: :string }
+                   }
+                 }
                }
 
         let(:company) { create(:company) }
@@ -188,6 +197,25 @@ RSpec.describe 'Api::V1::Positions', type: :request do
       }
 
       response '200', 'position updated' do
+        schema type: :object,
+               required: %w[id title status company],
+               properties: {
+                 id: { type: :integer },
+                 title: { type: :string },
+                 description: { type: :string, nullable: true },
+                 vacancy_url: { type: :string, nullable: true },
+                 status: { type: :string },
+                 company_id: { type: :integer },
+                 user_id: { type: :integer },
+                 company: {
+                   type: :object,
+                   properties: {
+                     id: { type: :integer },
+                     name: { type: :string }
+                   }
+                 }
+               }
+
         let(:record) { create(:position, user: signed_in_user) }
         let(:id) { record.id }
         let(:position) { { position: { title: 'Updated Title' } } }
