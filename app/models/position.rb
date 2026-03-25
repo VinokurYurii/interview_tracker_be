@@ -8,7 +8,5 @@ class Position < ApplicationRecord
   has_many :interview_stages, dependent: :destroy
 
   validates :title, presence: true
-  validates :description, presence: true
-  validates :vacancy_url, presence: true
   enum :status, STATUSES.index_by(&:itself)
 end

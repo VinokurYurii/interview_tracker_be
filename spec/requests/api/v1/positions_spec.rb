@@ -20,11 +20,18 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                  properties: {
                    id: { type: :integer },
                    title: { type: :string },
-                   description: { type: :string },
-                   vacancy_url: { type: :string },
+                   description: { type: :string, nullable: true },
+                   vacancy_url: { type: :string, nullable: true },
                    status: { type: :string },
                    company_id: { type: :integer },
-                   user_id: { type: :integer }
+                   user_id: { type: :integer },
+                   company: {
+                     type: :object,
+                     properties: {
+                       id: { type: :integer },
+                       name: { type: :string }
+                     }
+                   }
                  }
                }
 
@@ -52,7 +59,7 @@ RSpec.describe 'Api::V1::Positions', type: :request do
         properties: {
           position: {
             type: :object,
-            required: %w[title description vacancy_url company_id],
+            required: %w[title company_id],
             properties: {
               title: { type: :string },
               description: { type: :string },
