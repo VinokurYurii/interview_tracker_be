@@ -133,5 +133,6 @@ jobs:
             curl -so ~/app/docker-compose.yml https://raw.githubusercontent.com/VinokurYurii/interview_tracker_be/main/deploy/docker-compose.yml
             cd ~/app
             docker compose pull api
+            docker compose run --rm api bin/rails db:prepare
             docker compose up -d api
             docker image prune -f
