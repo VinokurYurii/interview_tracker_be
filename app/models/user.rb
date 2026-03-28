@@ -8,6 +8,14 @@ class User < ApplicationRecord
   has_many :positions, dependent: :destroy
   has_many :companies, through: :positions
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[email first_name last_name created_at updated_at]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[positions companies]
+  end
+
   validates :email, length: { maximum: 100 }
   validates :first_name, presence: true, length: { maximum: 50 }
   validates :last_name, presence: true, length: { maximum: 50 }
