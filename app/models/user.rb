@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :positions, dependent: :destroy
   has_many :companies, through: :positions
 
+  validates :email, length: { maximum: 100 }
   validates :first_name, presence: true, length: { maximum: 50 }
   validates :last_name, presence: true, length: { maximum: 50 }
 end
