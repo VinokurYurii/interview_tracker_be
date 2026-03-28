@@ -24,16 +24,9 @@ module InterviewTracker
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    # Only loads a smaller set of middleware suitable for API only apps.
-    # Middleware like session, flash, cookies can be added back manually.
-    # Skip views, helpers and assets when generating a new resource.
-    config.api_only = true
-
-    # Warden (used by Devise) requires session middleware even in API mode.
-    # Sessions are not used for authentication (JWT handles that), but Warden
-    # needs the middleware present to function.
-    config.session_store :cookie_store, key: '_interview_tracker_session'
-    config.middleware.use ActionDispatch::Cookies
-    config.middleware.use config.session_store, config.session_options
+    # The app is an API backend, but api_only is disabled so that ActiveAdmin
+    # (which needs layouts, views, flash, and full ActionController::Base support)
+    # can work alongside the API. Our API controllers still explicitly inherit
+    # from ActionController::API, so they keep the lean API behaviour.
   end
 end

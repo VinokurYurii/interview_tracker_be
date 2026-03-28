@@ -41,6 +41,11 @@ gem 'rswag-api'
 gem 'rack-cors'
 gem 'rack-attack'
 
+# Admin interface — requires sprockets for asset pipeline (CSS/JS)
+gem 'activeadmin'
+gem 'sprockets-rails'
+gem 'sassc-rails'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem 'debug', platforms: %i[ mri windows ], require: 'debug/prelude'

@@ -10,6 +10,14 @@ class InterviewStage < ApplicationRecord
   enum :stage_type, STAGE_TYPES.index_by(&:itself)
   enum :status, STATUSES.index_by(&:itself)
 
+  def self.ransackable_attributes(auth_object = nil)
+    %w[stage_type status scheduled_at notes calendar_link created_at updated_at position_id]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[position feedbacks]
+  end
+
   validates :stage_type, presence: true
   validates :status, presence: true
 end
