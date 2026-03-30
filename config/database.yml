@@ -71,7 +71,7 @@ production:
     database: interview_tracker_production
     host: <%= ENV.fetch('DATABASE_HOST', 'localhost') %>
     username: <%= ENV['DATABASE_USERNAME'] %>
-    password: <%= ENV['DATABASE_PASSWORD'] %>
+    password: <%= Rails.application.credentials.dig(:database, :password) %>
     port: <%= ENV.fetch('DATABASE_PORT', 5432) %>
   cache:
     <<: *primary_production
