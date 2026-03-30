@@ -3,6 +3,7 @@
 module Api
   module Auth
     class SessionsController < Devise::SessionsController
+      skip_forgery_protection
       respond_to :json
 
       private
