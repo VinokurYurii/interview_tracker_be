@@ -3,7 +3,7 @@
 ActiveAdmin.register User do
   menu priority: 2
 
-  permit_params :email, :first_name, :last_name, :password
+  permit_params :email, :first_name, :last_name, :password, :password_confirmation
 
   index do
     selectable_column
@@ -46,8 +46,21 @@ ActiveAdmin.register User do
       f.input :email
       f.input :first_name
       f.input :last_name
-      f.input :password
+      if f.object.new_record?
+        f.input :password
+        f.input :password_confirmation
+      end
     end
     f.actions
+  end
+
+  controller do
+    def update
+      if params[:user][:password].blank?
+        params[:user].delete(:password)
+        params[:user].delete(:password_confirmation)
+      end
+      super
+    end
   end
 end
