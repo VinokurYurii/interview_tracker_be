@@ -46,6 +46,25 @@ services:
     stdin_open: true
     tty: true
 
+  sidekiq:
+    build:
+      context: .
+      target: development
+    command: bundle exec sidekiq
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    env_file:
+      - .env
+    environment:
+      - DATABASE_HOST=db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   bundle_cache:

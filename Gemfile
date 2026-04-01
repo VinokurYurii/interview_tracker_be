@@ -41,6 +41,8 @@ gem 'rswag-api'
 gem 'rack-cors'
 gem 'rack-attack'
 gem 'redis'
+gem 'ruby-openai'
+gem 'sidekiq'
 
 # Admin interface — requires sprockets for asset pipeline (CSS/JS)
 gem 'activeadmin'
