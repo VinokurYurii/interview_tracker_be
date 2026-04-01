@@ -13,17 +13,13 @@ module Services
 
       def initialize(model: DEFAULT_MODEL)
         @model = model
-        @client = OpenAI::Client.new(
-          access_token: api_key,
-          uri_base: GEMINI_URI_BASE
-        )
       end
 
       def call(prompt:, system: nil, temperature: 0.7, max_tokens: nil)
         messages = build_messages(prompt, system)
         parameters = build_parameters(messages, temperature, max_tokens)
 
-        response = @client.chat(parameters: parameters)
+        response = client.chat(parameters: parameters)
         parse_response(response)
       rescue Faraday::TooManyRequestsError => e
         raise RateLimitError, e.message
@@ -40,6 +36,13 @@ module Services
       end
 
       private
+
+      def client
+        @client ||= OpenAI::Client.new(
+          access_token: api_key,
+          uri_base: GEMINI_URI_BASE
+        )
+      end
 
       def api_key
         Rails.application.credentials.dig(:gemini, :api_key) ||

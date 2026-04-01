@@ -13,17 +13,9 @@ RSpec.describe Services::AI::GeminiClient do
   end
 
   describe '#initialize' do
-    it 'uses default model when none provided' do
+    it 'does not create OpenAI client eagerly' do
       described_class.new
-      expect(OpenAI::Client).to have_received(:new).with(
-        access_token: api_key,
-        uri_base: described_class::GEMINI_URI_BASE
-      )
-    end
-
-    it 'raises error when API key is missing' do
-      allow(Rails.application.credentials).to receive(:dig).with(:gemini, :api_key).and_return(nil)
-      expect { described_class.new }.to raise_error(described_class::Error, /API key not found/)
+      expect(OpenAI::Client).not_to have_received(:new)
     end
   end
 
@@ -157,6 +149,12 @@ RSpec.describe Services::AI::GeminiClient do
       allow(openai_client).to receive(:chat).and_raise(Faraday::TimeoutError.new('Timeout'))
 
       expect { client.call(prompt: 'Hello') }.to raise_error(described_class::ConnectionError, /Timeout/)
+    end
+
+    it 'raises Error when API key is missing' do
+      allow(Rails.application.credentials).to receive(:dig).with(:gemini, :api_key).and_return(nil)
+
+      expect { described_class.new.call(prompt: 'Hello') }.to raise_error(described_class::Error, /API key not found/)
     end
   end
 end
