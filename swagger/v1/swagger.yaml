@@ -495,6 +495,14 @@ paths:
                           type: integer
                         name:
                           type: string
+                    resume:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
         '401':
           description: unauthorized
     post:
@@ -540,6 +548,14 @@ paths:
                         type: integer
                       name:
                         type: string
+                  resume:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
         '422':
           description: invalid params
           content:
@@ -577,6 +593,9 @@ paths:
                       type: string
                     company_id:
                       type: integer
+                    resume_id:
+                      type: integer
+                      nullable: true
   "/api/positions/{id}":
     parameters:
     - name: id
@@ -613,6 +632,14 @@ paths:
                     type: integer
                   company:
                     type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                  resume:
+                    type: object
+                    nullable: true
                     properties:
                       id:
                         type: integer
@@ -667,6 +694,14 @@ paths:
                         type: integer
                       name:
                         type: string
+                  resume:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
         '422':
           description: invalid params
         '403':
@@ -690,6 +725,9 @@ paths:
                       type: string
                     status:
                       type: string
+                    resume_id:
+                      type: integer
+                      nullable: true
     delete:
       summary: Deletes a position
       tags:
@@ -699,6 +737,200 @@ paths:
       responses:
         '204':
           description: position deleted
+        '403':
+          description: forbidden — not owner
+        '401':
+          description: unauthorized
+  "/api/resumes":
+    get:
+      summary: Returns resumes for current user
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: resumes returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - name
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+                    file_url:
+                      type: string
+                      nullable: true
+                    created_at:
+                      type: string
+                    updated_at:
+                      type: string
+        '401':
+          description: unauthorized
+    post:
+      summary: Creates a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: resume created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - name
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_url:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+        '422':
+          description: invalid params
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+        required: true
+  "/api/resumes/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Returns a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: resume returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - name
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_url:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+        '403':
+          description: forbidden — not owner
+        '404':
+          description: not found
+        '401':
+          description: unauthorized
+    patch:
+      summary: Updates a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: resume updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - name
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_url:
+                    type: string
+                    nullable: true
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+        '422':
+          description: invalid params
+        '403':
+          description: forbidden — not owner
+        '401':
+          description: unauthorized
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+    delete:
+      summary: Deletes a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: resume deleted (no linked positions)
+        '200':
+          description: file removed but record retained (has linked positions)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  warning:
+                    type: string
+                  resume:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      file_url:
+                        type: string
+                        nullable: true
         '403':
           description: forbidden — not owner
         '401':

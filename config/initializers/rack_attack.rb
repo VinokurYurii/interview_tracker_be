@@ -3,6 +3,7 @@
 # Rack::Attack — rate limiting middleware.
 # Operates at the Rack level, filtering requests BEFORE they reach Rails controllers.
 # Counters are stored in Redis for persistence across app restarts and deploys.
+return if Rails.env.test?
 Rack::Attack.cache.store = ActiveSupport::Cache::RedisCacheStore.new(
   url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/0')
 )

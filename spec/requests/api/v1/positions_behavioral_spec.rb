@@ -56,6 +56,31 @@ RSpec.describe 'Api::V1::Positions', type: :request do
     end
   end
 
+  describe 'POST /api/positions (with resume)' do
+    it 'creates a position with a linked resume' do
+      resume = create(:resume, user: user)
+
+      post '/api/positions',
+           params: { position: { title: 'Dev', company_id: company.id, resume_id: resume.id } },
+           headers: headers, as: :json
+
+      expect(response).to have_http_status(:created)
+      data = JSON.parse(response.body)
+      expect(data['resume']['id']).to eq(resume.id)
+      expect(data['resume']['name']).to eq(resume.name)
+    end
+
+    it 'creates a position without a resume' do
+      post '/api/positions',
+           params: { position: { title: 'Dev', company_id: company.id } },
+           headers: headers, as: :json
+
+      expect(response).to have_http_status(:created)
+      data = JSON.parse(response.body)
+      expect(data['resume']).to be_nil
+    end
+  end
+
   describe 'GET /api/positions/:id' do
     it 'returns the position with company data' do
       position = create(:position, user: user)
@@ -104,6 +129,29 @@ RSpec.describe 'Api::V1::Positions', type: :request do
                                              headers: headers, as: :json
 
       expect(position.reload.company_id).to eq(company.id)
+    end
+
+    it 'links a resume to a position' do
+      position = create(:position, user: user)
+      resume = create(:resume, user: user)
+
+      patch "/api/positions/#{position.id}", params: { position: { resume_id: resume.id } },
+                                             headers: headers, as: :json
+
+      expect(response).to have_http_status(:ok)
+      data = JSON.parse(response.body)
+      expect(data['resume']['id']).to eq(resume.id)
+    end
+
+    it 'unlinks a resume from a position' do
+      resume = create(:resume, user: user)
+      position = create(:position, user: user, resume: resume)
+
+      patch "/api/positions/#{position.id}", params: { position: { resume_id: nil } },
+                                             headers: headers, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(position.reload.resume_id).to be_nil
     end
 
     it 'returns 403 for another user\'s position' do
