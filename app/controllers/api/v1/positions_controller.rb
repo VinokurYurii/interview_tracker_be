@@ -6,7 +6,7 @@ module Api
       before_action :set_position, only: %i[show update destroy]
 
       def index
-        positions = policy_scope(Position).includes(:company, interview_stages: :feedbacks)
+        positions = policy_scope(Position).includes(:company, :resume, interview_stages: :feedbacks)
         render json: positions
       end
 
@@ -46,11 +46,11 @@ module Api
       end
 
       def position_params
-        params.expect(position: %i[title description vacancy_url status company_id])
+        params.expect(position: %i[title description vacancy_url status company_id resume_id])
       end
 
       def update_params
-        params.expect(position: %i[title description vacancy_url status])
+        params.expect(position: %i[title description vacancy_url status resume_id])
       end
     end
   end
