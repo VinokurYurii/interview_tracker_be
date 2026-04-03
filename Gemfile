@@ -43,6 +43,7 @@ gem 'rack-attack'
 gem 'redis'
 gem 'ruby-openai'
 gem 'sidekiq'
+gem 'aws-sdk-s3', require: false
 
 # Admin interface — requires sprockets for asset pipeline (CSS/JS)
 gem 'activeadmin'
