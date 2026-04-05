@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class GenerateResumeAnalysisJob < ApplicationJob
-  queue_as :default
+  queue_as :ai
 
   def perform(user_id:, resume_id:)
     analysis = ResumeAnalysis.find_by!(resume_id: resume_id)
