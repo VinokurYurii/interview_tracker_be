@@ -234,4 +234,62 @@ RSpec.describe 'Api::V1::Resumes', type: :request do
       end
     end
   end
+
+  path '/api/resumes/{id}/generate_analysis' do
+    let(:signed_in_user) { create(:user) }
+    let(:Authorization) { "Bearer #{auth_headers_for(signed_in_user)['Authorization'].split.last}" }
+
+    parameter name: :id, in: :path, type: :integer
+
+    post 'Triggers AI career analysis for a resume' do
+      tags 'Resumes'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+
+      response '202', 'analysis enqueued' do
+        schema type: :object,
+               required: %w[status],
+               properties: {
+                 content: { type: :string, nullable: true },
+                 status: { type: :string, enum: %w[pending processing completed failed] }
+               }
+
+        let(:record) { create(:resume, :with_file, user: signed_in_user) }
+        let(:id) { record.id }
+
+        before do
+          position = create(:position, user: signed_in_user, resume: record)
+          create(:interview_stage, position: position)
+        end
+
+        run_test!
+      end
+
+      response '422', 'resume not analyzable or analysis in progress' do
+        schema type: :object,
+               properties: {
+                 error: { type: :string }
+               }
+
+        let(:record) { create(:resume, user: signed_in_user) }
+        let(:id) { record.id }
+
+        run_test!
+      end
+
+      response '403', 'forbidden — not owner' do
+        let(:other_resume) { create(:resume, :with_file) }
+        let(:id) { other_resume.id }
+
+        run_test!
+      end
+
+      response '401', 'unauthorized' do
+        let(:Authorization) { '' }
+        let(:id) { 1 }
+
+        run_test!
+      end
+    end
+  end
 end

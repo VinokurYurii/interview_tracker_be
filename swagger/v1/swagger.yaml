@@ -935,6 +935,52 @@ paths:
           description: forbidden — not owner
         '401':
           description: unauthorized
+  "/api/resumes/{id}/generate_analysis":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Triggers AI career analysis for a resume
+      tags:
+      - Resumes
+      security:
+      - bearer_auth: []
+      responses:
+        '202':
+          description: analysis enqueued
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                properties:
+                  content:
+                    type: string
+                    nullable: true
+                  status:
+                    type: string
+                    enum:
+                    - pending
+                    - processing
+                    - completed
+                    - failed
+        '422':
+          description: resume not analyzable or analysis in progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '403':
+          description: forbidden — not owner
+        '401':
+          description: unauthorized
   "/api/user":
     get:
       summary: Returns the current user

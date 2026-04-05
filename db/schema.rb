@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_141001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_152126) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -105,6 +105,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_141001) do
     t.index ["user_id"], name: "index_positions_on_user_id"
   end
 
+  create_table "resume_analyses", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.string "model"
+    t.bigint "resume_id", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "tokens_used"
+    t.datetime "updated_at", null: false
+    t.index ["resume_id"], name: "index_resume_analyses_on_resume_id", unique: true
+  end
+
   create_table "resumes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.boolean "default", default: false, null: false
@@ -139,5 +151,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_141001) do
   add_foreign_key "positions", "companies"
   add_foreign_key "positions", "resumes", on_delete: :nullify
   add_foreign_key "positions", "users"
+  add_foreign_key "resume_analyses", "resumes"
   add_foreign_key "resumes", "users"
 end

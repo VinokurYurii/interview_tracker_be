@@ -3,6 +3,7 @@
 class Resume < ApplicationRecord
   belongs_to :user
   has_many :positions, dependent: :nullify
+  has_one :resume_analysis, dependent: :destroy
   has_one_attached :file
 
   validates :name, presence: true, uniqueness: { scope: :user_id }
@@ -12,6 +13,10 @@ class Resume < ApplicationRecord
 
   def self.ransackable_attributes(auth_object = nil)
     %w[name created_at updated_at user_id]
+  end
+
+  def analyzable?
+    file.attached? && positions.joins(:interview_stages).exists?
   end
 
   def self.ransackable_associations(auth_object = nil)

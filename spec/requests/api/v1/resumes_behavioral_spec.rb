@@ -167,4 +167,63 @@ RSpec.describe 'Api::V1::Resumes', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  describe 'POST /api/resumes/:id/generate_analysis' do
+    it 'returns 202 and enqueues job when resume is analyzable' do
+      resume = create(:resume, :with_file, user: user)
+      position = create(:position, user: user, resume: resume)
+      create(:interview_stage, position: position)
+
+      expect {
+        post "/api/resumes/#{resume.id}/generate_analysis", headers: headers
+      }.to have_enqueued_job(GenerateResumeAnalysisJob)
+
+      expect(response).to have_http_status(:accepted)
+      data = JSON.parse(response.body)
+      expect(data['status']).to eq('pending')
+    end
+
+    it 'returns 422 when resume has no file' do
+      resume = create(:resume, user: user)
+      position = create(:position, user: user, resume: resume)
+      create(:interview_stage, position: position)
+
+      post "/api/resumes/#{resume.id}/generate_analysis", headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      data = JSON.parse(response.body)
+      expect(data['error']).to include('no attached file')
+    end
+
+    it 'returns 422 when resume has no positions with stages' do
+      resume = create(:resume, :with_file, user: user)
+
+      post "/api/resumes/#{resume.id}/generate_analysis", headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      data = JSON.parse(response.body)
+      expect(data['error']).to include('no positions with interview stages')
+    end
+
+    it 'returns 422 when analysis is already in progress' do
+      resume = create(:resume, :with_file, user: user)
+      position = create(:position, user: user, resume: resume)
+      create(:interview_stage, position: position)
+      create(:resume_analysis, resume: resume, status: :pending)
+
+      post "/api/resumes/#{resume.id}/generate_analysis", headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      data = JSON.parse(response.body)
+      expect(data['error']).to include('already in progress')
+    end
+
+    it 'returns 403 for another user\'s resume' do
+      other_resume = create(:resume, :with_file)
+
+      post "/api/resumes/#{other_resume.id}/generate_analysis", headers: headers
+
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end
