@@ -23,5 +23,4 @@ ActiveAdmin.setup do |config|
 
   # Date/time display format.
   config.localize_format = :long
-
 end
