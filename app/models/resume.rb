@@ -6,6 +6,7 @@ class Resume < ApplicationRecord
   has_one_attached :file
 
   validates :name, presence: true, uniqueness: { scope: :user_id }
+  validate :only_one_default_per_user
 
   validate :acceptable_file
 
@@ -18,6 +19,13 @@ class Resume < ApplicationRecord
   end
 
   private
+
+  def only_one_default_per_user
+    return unless default?
+    return unless user&.resumes&.where(default: true)&.where&.not(id: id)&.exists?
+
+    errors.add(:default, 'resume already exists for this user')
+  end
 
   def acceptable_file
     return unless file.attached?

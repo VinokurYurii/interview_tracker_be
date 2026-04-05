@@ -3,12 +3,13 @@
 ActiveAdmin.register Resume do
   menu priority: 5
 
-  permit_params :name, :user_id, :file
+  permit_params :name, :user_id, :file, :default
 
   index do
     selectable_column
     id_column
     column :name
+    column :default
     column(:user) { |r| "#{r.user.first_name} #{r.user.last_name}" }
     column(:file) { |r| r.file.attached? ? 'Attached' : 'No file' }
     column :created_at
@@ -23,6 +24,7 @@ ActiveAdmin.register Resume do
     attributes_table do
       row :id
       row :name
+      row :default
       row(:user) { |r| "#{r.user.first_name} #{r.user.last_name}" }
       row(:file) do |r|
         if r.file.attached?
@@ -48,6 +50,7 @@ ActiveAdmin.register Resume do
     f.inputs do
       f.input :user, as: :select, collection: User.all.map { |u| ["#{u.first_name} #{u.last_name}", u.id] }
       f.input :name
+      f.input :default
       f.input :file, as: :file
     end
     f.actions

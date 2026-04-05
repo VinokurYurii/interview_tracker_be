@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ResumeSerializer < ActiveModel::Serializer
-  attributes :id, :name, :file_url, :created_at, :updated_at
+  attributes :id, :name, :default, :file_url, :created_at, :updated_at
 
   def file_url
     return nil unless object.file.attached?

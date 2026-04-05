@@ -15,21 +15,24 @@ module Api
       end
 
       def create
-        resume = current_user.resumes.new(resume_params)
-        authorize resume
+        authorize Resume
 
-        if resume.save
-          render json: resume, status: :created
+        result = Services::Resumes::Create.new(current_user, resume_params).call
+
+        if result[:success]
+          render json: result[:resume], status: :created
         else
-          render json: { errors: resume.errors.full_messages }, status: :unprocessable_content
+          render json: { errors: result[:errors] }, status: :unprocessable_content
         end
       end
 
       def update
-        if @resume.update(resume_params)
-          render json: @resume
+        result = Services::Resumes::Update.new(@resume, resume_params).call
+
+        if result[:success]
+          render json: result[:resume]
         else
-          render json: { errors: @resume.errors.full_messages }, status: :unprocessable_content
+          render json: { errors: result[:errors] }, status: :unprocessable_content
         end
       end
 
@@ -53,7 +56,7 @@ module Api
       end
 
       def resume_params
-        params.expect(resume: %i[name file])
+        params.expect(resume: %i[name file default])
       end
     end
   end
