@@ -44,6 +44,7 @@ gem 'redis'
 gem 'ruby-openai'
 gem 'sidekiq'
 gem 'aws-sdk-s3', require: false
+gem 'pdf-reader'
 
 # Admin interface — requires sprockets for asset pipeline (CSS/JS)
 gem 'activeadmin'
