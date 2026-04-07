@@ -8,3 +8,5 @@ Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: single_quotes
+Bundler/OrderedGems:
+  Enabled: true

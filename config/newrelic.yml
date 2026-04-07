@@ -1,0 +1,35 @@
+common: &default_settings
+  license_key: <%= Rails.application.credentials.dig(:new_relic, :license_key) %>
+  app_name: interview-tracker
+
+  distributed_tracing:
+    enabled: true
+
+  log_level: info
+
+  application_logging:
+    enabled: true
+    forwarding:
+      enabled: true
+      max_samples_stored: 10000
+    metrics:
+      enabled: true
+    local_decorating:
+      enabled: false
+
+development:
+  <<: *default_settings
+  app_name: interview-tracker (Development)
+  monitor_mode: false
+
+test:
+  <<: *default_settings
+  monitor_mode: false
+
+staging:
+  <<: *default_settings
+  app_name: interview-tracker (Staging)
+
+production:
+  <<: *default_settings
+  app_name: interview-tracker
