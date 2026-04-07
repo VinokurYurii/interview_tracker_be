@@ -6,7 +6,7 @@ module Api
       before_action :set_resume, only: %i[show update destroy generate_analysis]
 
       def index
-        resumes = policy_scope(Resume)
+        resumes = policy_scope(Resume).includes(:resume_analysis, file_attachment: :blob)
         render json: resumes
       end
 
