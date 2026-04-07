@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'active_model_serializers'
 gem 'activeadmin'
+gem 'active_model_serializers'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'devise'
