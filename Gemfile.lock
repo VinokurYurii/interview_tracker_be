@@ -293,6 +293,8 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     net-ssh (7.3.1)
+    newrelic_rpm (10.2.0)
+      logger
     nio4r (2.7.5)
     nokogiri (1.19.2-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -577,6 +579,7 @@ DEPENDENCIES
   factory_bot_rails
   image_processing (~> 1.2)
   kamal
+  newrelic_rpm
   pdf-reader
   pg (~> 1.1)
   puma (>= 5.0)

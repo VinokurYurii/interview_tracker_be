@@ -28,6 +28,7 @@ services:
     build:
       context: .
       target: development
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - .:/rails
       - bundle_cache:/usr/local/bundle
@@ -50,6 +51,7 @@ services:
     build:
       context: .
       target: development
+    user: "${UID:-1000}:${GID:-1000}"
     command: bundle exec sidekiq
     volumes:
       - .:/rails
