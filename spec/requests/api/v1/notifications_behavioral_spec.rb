@@ -58,12 +58,12 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
       expect(data['read_at']).to be_present
     end
 
-    it 'returns 403 for another user\'s notification' do
+    it 'returns 404 for another user\'s notification' do
       other_notification = create(:notification)
 
       post "/api/notifications/#{other_notification.id}/mark_read", headers: headers
 
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:not_found)
     end
 
     it 'returns 404 for non-existent notification' do

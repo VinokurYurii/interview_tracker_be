@@ -67,14 +67,7 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
         run_test!
       end
 
-      response '403', 'forbidden — not owner' do
-        let(:other_notification) { create(:notification) }
-        let(:id) { other_notification.id }
-
-        run_test!
-      end
-
-      response '404', 'not found' do
+      response '404', 'not found or not owner' do
         let(:id) { 0 }
 
         run_test!

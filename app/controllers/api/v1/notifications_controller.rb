@@ -9,8 +9,7 @@ module Api
       end
 
       def mark_read
-        notification = Notification.find(params[:id])
-        authorize notification
+        notification = policy_scope(Notification).find(params[:id])
         notification.update!(read_at: DateTime.now)
         render json: notification
       end

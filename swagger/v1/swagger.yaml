@@ -524,10 +524,8 @@ paths:
                   created_at:
                     type: string
                     format: date-time
-        '403':
-          description: forbidden — not owner
         '404':
-          description: not found
+          description: not found or not owner
         '401':
           description: unauthorized
   "/api/positions":
