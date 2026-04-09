@@ -6,6 +6,7 @@ class InterviewStage < ApplicationRecord
 
   belongs_to :position
   has_many :feedbacks, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   enum :stage_type, STAGE_TYPES.index_by(&:itself)
   enum :status, STATUSES.index_by(&:itself)

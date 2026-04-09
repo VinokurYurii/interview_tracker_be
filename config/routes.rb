@@ -27,6 +27,11 @@ Rails.application.routes.draw do
           post :generate_analysis
         end
       end
+      resources :notifications, only: %i[index] do
+        member do
+          post :mark_read
+        end
+      end
       resources :positions, only: %i[index show create update destroy] do
         resources :interview_stages, only: %i[index show create update destroy] do
           resources :feedbacks, only: %i[index create update destroy]

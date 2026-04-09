@@ -7,6 +7,7 @@ class Position < ApplicationRecord
   belongs_to :company
   belongs_to :resume, optional: true
   has_many :interview_stages, dependent: :destroy
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   def self.ransackable_attributes(auth_object = nil)
     %w[title status description vacancy_url created_at updated_at user_id company_id resume_id]
