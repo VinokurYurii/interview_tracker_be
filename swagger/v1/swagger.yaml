@@ -449,6 +449,87 @@ paths:
           description: not found — not owner
         '401':
           description: unauthorized
+  "/api/notifications":
+    get:
+      summary: Returns notifications for current user
+      tags:
+      - Notifications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: notifications returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - title
+                  - body
+                  - created_at
+                  properties:
+                    id:
+                      type: integer
+                    title:
+                      type: string
+                    body:
+                      type: string
+                    read_at:
+                      type: string
+                      format: date-time
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+        '401':
+          description: unauthorized
+  "/api/notifications/{id}/mark_read":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Marks a notification as read
+      tags:
+      - Notifications
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - id
+                - title
+                - body
+                - created_at
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  body:
+                    type: string
+                  read_at:
+                    type: string
+                    format: date-time
+                  created_at:
+                    type: string
+                    format: date-time
+        '403':
+          description: forbidden — not owner
+        '404':
+          description: not found
+        '401':
+          description: unauthorized
   "/api/positions":
     get:
       summary: Returns positions for current user

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_152126) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_203504) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -59,6 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_152126) do
     t.string "name", null: false
     t.string "site_link"
     t.datetime "updated_at", null: false
+    t.index "lower((name)::text)", name: "index_companies_on_lower_name", unique: true
   end
 
   create_table "feedbacks", force: :cascade do |t|
@@ -88,6 +89,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_152126) do
     t.datetime "exp", null: false
     t.string "jti", null: false
     t.index ["jti"], name: "index_jwt_denylist_on_jti", unique: true
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notifiable_type", null: false
+    t.datetime "read_at"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "positions", force: :cascade do |t|
@@ -148,6 +163,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_152126) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "feedbacks", "interview_stages"
   add_foreign_key "interview_stages", "positions"
+  add_foreign_key "notifications", "users"
   add_foreign_key "positions", "companies"
   add_foreign_key "positions", "resumes", on_delete: :nullify
   add_foreign_key "positions", "users"

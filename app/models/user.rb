@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :positions, dependent: :destroy
   has_many :companies, through: :positions
   has_many :resumes, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   def self.ransackable_attributes(auth_object = nil)
     %w[email first_name last_name created_at updated_at]
@@ -15,6 +16,10 @@ class User < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     %w[positions companies resumes]
+  end
+
+  def unread_notifications_count
+    notifications.where(read_at: nil).count
   end
 
   validates :email, length: { maximum: 100 }
