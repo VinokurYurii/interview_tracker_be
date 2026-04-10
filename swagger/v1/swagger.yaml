@@ -470,6 +470,8 @@ paths:
                   - title
                   - body
                   - created_at
+                  - notifiable_id
+                  - notifiable_type
                   properties:
                     id:
                       type: integer
@@ -484,6 +486,10 @@ paths:
                     created_at:
                       type: string
                       format: date-time
+                    notifiable_id:
+                      type: integer
+                    notifiable_type:
+                      type: string
         '401':
           description: unauthorized
   "/api/notifications/{id}/mark_read":
@@ -511,6 +517,8 @@ paths:
                 - title
                 - body
                 - created_at
+                - notifiable_id
+                - notifiable_type
                 properties:
                   id:
                     type: integer
@@ -524,6 +532,10 @@ paths:
                   created_at:
                     type: string
                     format: date-time
+                  notifiable_id:
+                    type: integer
+                  notifiable_type:
+                    type: string
         '404':
           description: not found or not owner
         '401':
