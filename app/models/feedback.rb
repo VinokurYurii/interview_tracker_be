@@ -3,7 +3,7 @@
 class Feedback < ApplicationRecord
   FEEDBACK_TYPES = %w[self_review company].freeze
 
-  belongs_to :interview_stage
+  belongs_to :interview_stage, touch: true
 
   enum :feedback_type, FEEDBACK_TYPES.index_by(&:itself)
 
