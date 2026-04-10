@@ -4,7 +4,7 @@ class InterviewStage < ApplicationRecord
   STAGE_TYPES = %w[hr screening technical live_coding system_design take_home client managerial final offer].freeze
   STATUSES = %w[planned done declined].freeze
 
-  belongs_to :position
+  belongs_to :position, touch: true
   has_many :feedbacks, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
 

@@ -1,0 +1,11 @@
+auto_reject_stale_positions:
+  cron: '0 2 * * *'
+  class: 'AutoRejectStalePositionsJob'
+  queue: default
+  description: 'Mark active positions with no activity for 30 days as rejected'
+
+auto_complete_past_stages:
+  cron: '15 2 * * *'
+  class: 'AutoCompletePastStagesJob'
+  queue: default
+  description: 'Mark planned interview stages whose scheduled date has passed as done'
