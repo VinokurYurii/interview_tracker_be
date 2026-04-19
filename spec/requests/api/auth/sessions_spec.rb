@@ -27,12 +27,13 @@ RSpec.describe 'Api::Auth::Sessions', type: :request do
 
       response '200', 'signed in — JWT token returned in Authorization header' do
         schema type: :object,
-               required: %w[id first_name last_name email],
+               required: %w[id first_name last_name email unread_notifications_count],
                properties: {
                  id: { type: :integer },
                  first_name: { type: :string },
                  last_name: { type: :string },
-                 email: { type: :string }
+                 email: { type: :string },
+                 unread_notifications_count: { type: :integer }
                }
 
         let(:existing_user) { create(:user, password: 'password123') }

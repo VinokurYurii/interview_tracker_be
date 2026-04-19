@@ -30,12 +30,13 @@ RSpec.describe 'Api::Auth::Registrations', type: :request do
 
       response '201', 'user registered — JWT token returned in Authorization header' do
         schema type: :object,
-               required: %w[id first_name last_name email],
+               required: %w[id first_name last_name email unread_notifications_count],
                properties: {
                  id: { type: :integer },
                  first_name: { type: :string },
                  last_name: { type: :string },
-                 email: { type: :string }
+                 email: { type: :string },
+                 unread_notifications_count: { type: :integer }
                }
 
         let(:user) do
