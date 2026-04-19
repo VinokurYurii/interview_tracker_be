@@ -37,6 +37,29 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
       data = JSON.parse(response.body)
       expect(data.first).to include('id', 'title', 'body', 'read_at', 'created_at')
     end
+
+    it 'returns empty metadata for Position notifications' do
+      position = create(:position, user: user)
+      create(:notification, user: user, notifiable: position)
+
+      get '/api/notifications', headers: headers
+
+      data = JSON.parse(response.body)
+      expect(data.first['notifiable_type']).to eq('Position')
+      expect(data.first['metadata']).to eq({})
+    end
+
+    it 'includes position_id in metadata for InterviewStage notifications' do
+      position = create(:position, user: user)
+      stage = create(:interview_stage, position: position)
+      create(:notification, user: user, notifiable: stage)
+
+      get '/api/notifications', headers: headers
+
+      data = JSON.parse(response.body)
+      expect(data.first['notifiable_type']).to eq('InterviewStage')
+      expect(data.first['metadata']).to eq({ 'position_id' => position.id })
+    end
   end
 
   describe 'POST /api/notifications/:id/mark_read' do

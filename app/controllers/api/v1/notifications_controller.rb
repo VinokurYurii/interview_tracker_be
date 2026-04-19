@@ -4,7 +4,7 @@ module Api
   module V1
     class NotificationsController < Api::V1::ApplicationController
       def index
-        notifications = policy_scope(Notification).recent
+        notifications = policy_scope(Notification).includes(:notifiable).recent
         render json: notifications
       end
 
