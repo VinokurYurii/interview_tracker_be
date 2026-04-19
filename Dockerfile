@@ -57,13 +57,19 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+# Create non-root user matching host UID/GID so named volumes mounted over
+# $BUNDLE_PATH and /rails inherit correct ownership and stay writable at runtime.
+RUN groupadd --system --gid 1000 rails && \
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+
 # Install all gems (including dev/test groups)
 COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache && \
+    chown -R rails:rails "${BUNDLE_PATH}" /rails
 
 # App code will be mounted as a volume — only copy entrypoint
-COPY bin/docker-entrypoint /rails/bin/docker-entrypoint
+COPY --chown=rails:rails bin/docker-entrypoint /rails/bin/docker-entrypoint
 RUN chmod +x /rails/bin/docker-entrypoint
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
