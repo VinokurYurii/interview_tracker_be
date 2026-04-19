@@ -14,12 +14,13 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
       response '200', 'user returned' do
         schema type: :object,
-               required: %w[id first_name last_name email],
+               required: %w[id first_name last_name email unread_notifications_count],
                properties: {
                  id: { type: :integer },
                  first_name: { type: :string },
                  last_name: { type: :string },
-                 email: { type: :string }
+                 email: { type: :string },
+                 unread_notifications_count: { type: :integer }
                }
 
         run_test!
@@ -53,12 +54,13 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
       response '200', 'user updated' do
         schema type: :object,
-               required: %w[id first_name last_name email],
+               required: %w[id first_name last_name email unread_notifications_count],
                properties: {
                  id: { type: :integer },
                  first_name: { type: :string },
                  last_name: { type: :string },
-                 email: { type: :string }
+                 email: { type: :string },
+                 unread_notifications_count: { type: :integer }
                }
 
         let(:user) { { user: { first_name: 'Jane' } } }

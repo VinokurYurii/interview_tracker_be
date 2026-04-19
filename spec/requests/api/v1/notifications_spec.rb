@@ -16,7 +16,7 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
         schema type: :array,
                items: {
                  type: :object,
-                 required: %w[id title body created_at notifiable_id notifiable_type],
+                 required: %w[id title body created_at notifiable_id notifiable_type metadata],
                  properties: {
                    id: { type: :integer },
                    title: { type: :string },
@@ -24,7 +24,14 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
                    read_at: { type: :string, format: 'date-time', nullable: true },
                    created_at: { type: :string, format: 'date-time' },
                    notifiable_id: { type: :integer },
-                   notifiable_type: { type: :string }
+                   notifiable_type: { type: :string },
+                   metadata: {
+                     type: :object,
+                     description: 'Context payload depending on notifiable_type. Empty for Position; includes position_id for InterviewStage.',
+                     properties: {
+                       position_id: { type: :integer }
+                     }
+                   }
                  }
                }
 
@@ -54,7 +61,7 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
 
       response '200', 'notification marked as read' do
         schema type: :object,
-               required: %w[id title body created_at notifiable_id notifiable_type],
+               required: %w[id title body created_at notifiable_id notifiable_type metadata],
                properties: {
                  id: { type: :integer },
                  title: { type: :string },
@@ -62,7 +69,14 @@ RSpec.describe 'Api::V1::Notifications', type: :request do
                  read_at: { type: :string, format: 'date-time' },
                  created_at: { type: :string, format: 'date-time' },
                  notifiable_id: { type: :integer },
-                 notifiable_type: { type: :string }
+                 notifiable_type: { type: :string },
+                 metadata: {
+                   type: :object,
+                   description: 'Context payload depending on notifiable_type. Empty for Position; includes position_id for InterviewStage.',
+                   properties: {
+                     position_id: { type: :integer }
+                   }
+                 }
                }
 
         let(:notification) { create(:notification, user: signed_in_user) }
