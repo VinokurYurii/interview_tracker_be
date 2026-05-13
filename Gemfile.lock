@@ -94,6 +94,9 @@ GEM
     addressable (2.8.9)
       public_suffix (>= 2.0.2, < 8.0)
     afm (1.0.0)
+    annotaterb (4.22.0)
+      activerecord (>= 6.0.0)
+      activesupport (>= 6.0.0)
     arbre (1.7.0)
       activesupport (>= 3.0.0)
       ruby2_keywords (>= 0.0.2)
@@ -582,6 +585,7 @@ PLATFORMS
 DEPENDENCIES
   active_model_serializers
   activeadmin
+  annotaterb
   aws-sdk-s3
   bootsnap
   brakeman

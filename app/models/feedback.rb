@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: feedbacks
+#
+#  id                 :bigint           not null, primary key
+#  content            :text             not null
+#  feedback_type      :string           not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  interview_stage_id :bigint           not null
+#
+# Indexes
+#
+#  index_feedbacks_on_interview_stage_id                    (interview_stage_id)
+#  index_feedbacks_on_interview_stage_id_and_feedback_type  (interview_stage_id,feedback_type) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (interview_stage_id => interview_stages.id)
+#
 class Feedback < ApplicationRecord
   FEEDBACK_TYPES = %w[self_review company].freeze
 

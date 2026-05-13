@@ -39,6 +39,10 @@ group :development, :test do
   gem 'rubocop-rails-omakase', require: false
 end
 
+group :development do
+  gem 'annotaterb'
+end
+
 group :test do
   gem 'rspec-rails', '~> 8.0', '>= 8.0.1'
   gem 'simplecov', require: false

@@ -1,5 +1,19 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: companies
+#
+#  id         :bigint           not null, primary key
+#  name       :string           not null
+#  site_link  :string
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_companies_on_lower_name  (lower((name)::text)) UNIQUE
+#
 class Company < ApplicationRecord
   has_many :positions, dependent: :restrict_with_error
   has_many :users, through: :positions
