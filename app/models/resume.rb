@@ -1,5 +1,25 @@
 # frozen_string_literal: true
 
+# == Schema Information
+#
+# Table name: resumes
+#
+#  id         :bigint           not null, primary key
+#  default    :boolean          default(FALSE), not null
+#  name       :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  user_id    :bigint           not null
+#
+# Indexes
+#
+#  index_resumes_on_user_id           (user_id)
+#  index_resumes_on_user_id_and_name  (user_id,name) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_...  (user_id => users.id)
+#
 class Resume < ApplicationRecord
   belongs_to :user
   has_many :positions, dependent: :nullify
